@@ -1,8 +1,10 @@
 <template>
   <q-list bordered>
+    <!-- //* If there's no application. Show no available. -->
     <q-item v-if="applications.length <= 0" class="q-pa-md">
       Currently no available applications
     </q-item>
+    <!-- //* If there's application, loop through it and display the content -->
     <div
       v-else
       v-for="(application, index) in applications"
@@ -53,7 +55,7 @@
 </template>
 
 <script>
-import Application from './../models/Application';
+import Application from "./../models/Application";
 
 export default {
   data() {
@@ -61,9 +63,13 @@ export default {
   },
 
   computed: {
+    //* Return application data with all relation from mysql.
     applications() {
-      return Application.query().where('status', 'active').withAll().get();
-    },
-  },
+      return Application.query()
+        .where("status", "active")
+        .withAll()
+        .get();
+    }
+  }
 };
 </script>
