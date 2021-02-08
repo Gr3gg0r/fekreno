@@ -1,76 +1,99 @@
-import { getToken } from './../datasources/localstorage.storage'
+import { getToken } from "./../datasources/localstorage.storage";
 
 // "async" is optional;
-// more info on params: https://quasar.dev/quasar-cli/cli-documentation/boot-files#Anatomy-of-a-boot-file
+// more info on params: https://quasar.dev/quasar-cli/cli-documentation/boot-files#Anatomy-of-a-boot-file'
+//* This is the default quasar boot structue. It enable the user to have access to  the app, router ,store and Vue
 export default async ({ app, router, store, Vue }) => {
-
+  //? The function was declared but never used.
   function hasPermission(roles, permissionRoles) {
-     if(!permissionRoles) return true
+    if (!permissionRoles) return true;
 
-    return roles.some(role => permissionRoles.indexOf(role) >= 0)
+    return roles.some(role => permissionRoles.indexOf(role) >= 0);
   }
 
   // URLs which gonna be public access
-  const whiteListURL = ['/login', '/register']
+  //* This is the url that does not needed authentication to access.
+  const whiteListURL = ["/login", "/register"];
 
-  router.beforeEach( async(to, from, next) => {
-
-    if(getToken(process.env.MAIN_BE_TOKEN)) {
-
-      if(to.path === '/login') {
-        next({ path: '/' })
+  //* Navigation guard
+  //* will be executed each time we change route.
+  router.beforeEach(async (to, from, next) => {
+    //*Check if user authenticate or not.
+    //* Check is based on token that was stored at localstorage.
+    if (getToken(process.env.MAIN_BE_TOKEN)) {
+      //* If user already login , block their access to /login page.
+      if (to.path === "/login") {
+        next({ path: "/" });
       } else {
-        if(store.getters.roles.length === 0) {
-
+        //* If no roles specifiy for this route, just allow it to pass.
+        //* Can be see in privacy route where there's no array declare in it array.
+        if (store.getters.roles.length === 0) {
           try {
-            await store.dispatch('GetInfo')
-            let links = []
+            //* Vuex called action from user module. Located at store/module/user.js
+            //* This will populate the user state.
+            await store.dispatch("GetInfo");
+            let links = [];
 
-            const routes = router.options.routes.filter(element => element.path === '/')
-
-            if(routes.length === 1) {
+            //* get only data route from "/" only .
+            //* Filter unauthenctication route such as '/login'
+            const routes = router.options.routes.filter(
+              element => element.path === "/"
+            );
+            //* Null checker for routes
+            if (routes.length === 1) {
+              //* push to link array only if the condition met.
               routes[0].children.forEach(route => {
-                if(route.meta.sidebar) {
-
-                  if(store.getters.roles.includes('master')) {
-                    links.push(route)
+                //* Filter route with no sidebar in meta.
+                if (route.meta.sidebar) {
+                  //* Store into link if user roles is master
+                  if (store.getters.roles.includes("master")) {
+                    links.push(route);
                   } else {
-                    if(route.meta.roles.length) {
-                      if(route.meta.roles.some(element => store.getters.roles.includes(element))) {
-                        links.push(route)
+                    //* check if there's role for specific route.
+                    if (route.meta.roles.length) {
+                      //* Check the route is the same as user role state.
+                      if (
+                        route.meta.roles.some(element =>
+                          store.getters.roles.includes(element)
+                        )
+                      ) {
+                        //* Add to link if route is the same as user role.
+                        links.push(route);
                       }
                     } else {
-                      links.push(route)
+                      //* push the route if no role specify.
+                      links.push(route);
                     }
                   }
                 }
-              })
+              });
             }
-
-            store.dispatch('SetMenu', links)
-
-            next({ ...to, replace: true })
-          } catch(err) {
-            console.log(err)
-            store.dispatch('Logout')
-                .then(() => {
-                  console.log('logout')
-                  next({ path: '/login' })
-                })
+            //* Set drawer navigation link.
+            //? Journal, material . The route and the icon was set here.
+            store.dispatch("SetMenu", links);
+            //* spread all to route and set their replace as true. So they can be replace.
+            next({ ...to, replace: true });
+            //! Execute only when there's error.
+          } catch (err) {
+            console.log(err);
+            //! Log out session an replace route to /login
+            store.dispatch("Logout").then(() => {
+              console.log("logout");
+              next({ path: "/login" });
+            });
           }
-
         } else {
-          next()
+          next();
         }
-
       }
     } else {
+      //* Check wheather the path is for public or authentication.
+      //* If yes proceed . If not redirect the user to login page.
       if (whiteListURL.indexOf(to.path) !== -1) {
-        next()
+        next();
       } else {
-        next('/login')
+        next("/login");
       }
     }
-
-  })
-}
+  });
+};
