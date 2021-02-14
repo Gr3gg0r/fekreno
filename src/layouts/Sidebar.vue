@@ -4,7 +4,7 @@
       <q-item class="q-py-lg">
         <q-img src="~assets/krenovator.png" width="240px" height="40px" />
       </q-item>
-
+      <!-- //* Create the drawer navigation from menus. -->
       <EssentialLink
         v-for="link in menus"
         :key="link.meta.title"
@@ -19,20 +19,23 @@
 </template>
 
 <script>
-import EssentialLink from '../components/EssentialLink';
-import { mapGetters } from 'vuex';
+//* Import essentiallink from component for displaying navigation
+//* for sidebar.
+import EssentialLink from "../components/EssentialLink";
+//* Called all getter from store/getters.
+import { mapGetters } from "vuex";
 
 export default {
   data() {
     return {};
   },
-
+  //* Spread all the menu registered for specific user role and pass it into essential link component.
   computed: {
-    ...mapGetters(['menus']),
+    ...mapGetters(["menus"])
   },
 
   components: {
-    EssentialLink,
-  },
+    EssentialLink
+  }
 };
 </script>

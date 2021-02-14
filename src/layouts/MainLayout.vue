@@ -11,9 +11,7 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
 
-        <q-toolbar-title>
-          
-        </q-toolbar-title>
+        <q-toolbar-title> </q-toolbar-title>
 
         <div>
           <q-btn flat class="text-white" @click="onClickLogout">Logout</q-btn>
@@ -37,23 +35,25 @@
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
-import Sidebar from './Sidebar'
+//? Essential link is declared but never used. It not  needed here.
+//? Essential link component is used at sidebar layout
+import EssentialLink from "components/EssentialLink.vue";
+import Sidebar from "./Sidebar";
 
 export default {
-  name: 'MainLayout',
+  name: "MainLayout",
   components: { Sidebar },
-  data () {
+  data() {
     return {
       leftDrawerOpen: false
-    }
+    };
   },
 
   methods: {
     onClickLogout() {
-      this.$store.dispatch('Logout')
-      this.$router.push('/login')
+      this.$store.dispatch("Logout");
+      this.$router.push("/login");
     }
-  },
-}
+  }
+};
 </script>

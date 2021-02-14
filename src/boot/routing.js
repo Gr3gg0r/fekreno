@@ -18,8 +18,9 @@ export default async ({ app, router, store, Vue }) => {
   //* Navigation guard
   //* will be executed each time we change route.
   router.beforeEach(async (to, from, next) => {
-    //*Check if user authenticate or not.
+    //* Get user token based on Backend token that was register together when user login.
     //* Check is based on token that was stored at localstorage.
+    //* Check user authentication status.
     if (getToken(process.env.MAIN_BE_TOKEN)) {
       //* If user already login , block their access to /login page.
       if (to.path === "/login") {
